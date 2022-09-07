@@ -1,0 +1,25 @@
+{
+  "name": "@abysser/matter-lint",
+  "version": "1.0.0",
+  "description": "A front-matter normalizer that depends on the commit history",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Abyssers/matter-lint.git"
+  },
+  "keywords": [
+    "front-matter",
+    "lint",
+    "git",
+    "nodejs"
+  ],
+  "author": "Morilence",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Abyssers/matter-lint/issues"
+  },
+  "homepage": "https://github.com/Abyssers/matter-lint#readme"
+}
