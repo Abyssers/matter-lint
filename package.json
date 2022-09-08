@@ -3,7 +3,9 @@
     "version": "1.0.0",
     "description": "A front-matter normalizer that depends on the commit history",
     "main": "dist/index.js",
-    "bin": "dist/bin.js",
+    "bin": {
+        "matter-lint": "dist/index.js"
+    },
     "type": "commonjs",
     "engines": {
         "node": ">=10.24.1"
