@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "target": "ES2015",
+        "outDir": "dist",
+        "moduleResolution": "node",
+        "declaration": true,
+        "noImplicitAny": true,
+        "noImplicitReturns": true,
+        "preserveConstEnums": true,
+        "experimentalDecorators": true,
+        "sourceMap": false
+    },
+    "include": ["src/*.ts", "src/**/*.ts"]
+}
