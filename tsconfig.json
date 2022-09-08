@@ -3,7 +3,7 @@
         "target": "ES2015",
         "outDir": "dist",
         "moduleResolution": "node",
-        "declaration": true,
+        "declaration": false,
         "noImplicitAny": true,
         "noImplicitReturns": true,
         "preserveConstEnums": true,
