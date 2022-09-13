@@ -16,7 +16,7 @@ export class Option {
             .toLowerCase()
             .split(/( |-)/)
             .filter(w => w !== "")
-            .map(w => w.at(0).toUpperCase() + w.slice(1))
+            .map((w, i) => (i === 0 ? w : w.at(0).toUpperCase() + w.slice(1)))
             .join("");
     }
 
