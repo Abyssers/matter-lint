@@ -2,7 +2,7 @@ import { resolve, extname } from "node:path";
 import { existsSync } from "node:fs";
 import { read } from "gray-matter";
 import { MatterOption } from "./option";
-import { MatterInfo } from "./info";
+import { MatterHandler } from "./handler";
 
 class MatterLint {
     #queue: string[];
@@ -55,13 +55,8 @@ class MatterLint {
         return { opts, paths };
     }
 
-    public add(
-        name: string,
-        param: boolean,
-        defaultValue: string | boolean,
-        callback: (opt: MatterOption, path: string, data: MatterInfo, content: string) => [MatterInfo, string]
-    ): MatterLint {
-        const option = new MatterOption(name, param, defaultValue, callback);
+    public add(name: string, param: boolean, defaultValue: string | boolean, handler: MatterHandler): MatterLint {
+        const option = new MatterOption(name, param, defaultValue, handler);
         this.#queue.push(name);
         const { camelcase, dashed, abbrev } = option;
         this.#options.set(name, option);
