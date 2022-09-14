@@ -71,16 +71,14 @@ class MatterLint {
         return { opts, paths };
     }
 
-    public config(key: string, value: any): MatterLint {
-        if (this.#options.has(key)) {
-            this.#options.get(key).set(value);
-        }
+    public config(key: string, value: string | boolean): MatterLint {
+        this.#options.has(key) && this.#options.get(key).set(value);
         return this;
     }
 
     public run(data: MatterInfo): void {
         this.#queue.forEach((name: string) => {
-            this.#options.get(name).handle(data);
+            this.#options.get(name)?.handle(data);
         });
     }
 }
