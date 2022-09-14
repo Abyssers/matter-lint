@@ -1,9 +1,10 @@
+import { MatterInfo } from "./info";
 export class Option {
     #name: string;
     #value: any;
-    #callback: () => void;
+    #callback: (opt: Option, data: MatterInfo) => void;
 
-    constructor(name: string, value: any, callback: () => void) {
+    constructor(name: string, value: any, callback: (opt: Option, data: MatterInfo) => void) {
         this.#name = name;
         this.#value = value;
         this.#callback = callback;
@@ -48,7 +49,7 @@ export class Option {
         return;
     }
 
-    public call(): void {
-        return this.#callback();
+    public handle(data: MatterInfo): void {
+        return this.#callback(this, data);
     }
 }
