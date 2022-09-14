@@ -1,20 +1,16 @@
 import { MatterInfo } from "./info";
+import { MatterHandler } from "./handler";
 export class MatterOption {
     #name: string;
     #value: string | boolean;
     #param: boolean; // whether parameters are required
-    #callback: (opt: MatterOption, path: string, data: MatterInfo, content: string) => [MatterInfo, string];
+    #handler: MatterHandler;
 
-    constructor(
-        name: string,
-        param: boolean,
-        value: string | boolean,
-        callback: (opt: MatterOption, path: string, data: MatterInfo, content: string) => [MatterInfo, string]
-    ) {
+    constructor(name: string, param: boolean, value: string | boolean, handler: MatterHandler) {
         this.#name = name;
         this.#param = param;
         this.#value = value;
-        this.#callback = callback;
+        this.#handler = handler;
     }
 
     get name(): string {
@@ -60,7 +56,7 @@ export class MatterOption {
         return;
     }
 
-    public handle(path: string, data: MatterInfo, content: string): [MatterInfo, string] {
-        return this.#callback(this, path, data, content);
+    public handle(path: string, data: MatterInfo, content: string): ReturnType<MatterHandler> {
+        return this.#handler(this, path, data, content);
     }
 }
