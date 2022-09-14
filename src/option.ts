@@ -1,10 +1,12 @@
 export class Option {
     #name: string;
     #value: any;
+    #callback: () => void;
 
-    constructor(name: string, value: any) {
+    constructor(name: string, value: any, callback: () => void) {
         this.#name = name;
         this.#value = value;
+        this.#callback = callback;
     }
 
     get name(): string {
@@ -46,7 +48,7 @@ export class Option {
         return;
     }
 
-    public use(): void {
-        return;
+    public call(): void {
+        return this.#callback();
     }
 }

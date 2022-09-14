@@ -17,6 +17,7 @@ export class Context {
     public config(key: string, value: any): boolean {
         if (this.#options.has(key)) {
             this.#options.get(key).set(value);
+            this.#options.get(key).call();
             return true;
         }
         return false;
