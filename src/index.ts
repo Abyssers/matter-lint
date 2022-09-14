@@ -1,7 +1,4 @@
 import { resolve } from "node:path";
-import { readFileSync } from "node:fs";
-import { jit } from "@abysser/jit";
-import { read } from "gray-matter";
 import { MatterInfo } from "./info";
 import { MatterOption } from "./option";
 import { lint } from "./lint";
@@ -11,7 +8,7 @@ const args: string[] = process.argv.slice(2);
 
 /* default configurations */
 lint.add("config", true, resolve(cwd, ".matterlint.json"), (opt: MatterOption, data: MatterInfo) => {
-    return;
+    return data;
 });
 
 lint.add("write", false, true, (opt: MatterOption, data: MatterInfo) => {
@@ -20,6 +17,7 @@ lint.add("write", false, true, (opt: MatterOption, data: MatterInfo) => {
     } else {
         /* write back */
     }
+    return data;
 });
 
-const { opts, paths } = lint.parse(cwd, args);
+lint.run(cwd, args);

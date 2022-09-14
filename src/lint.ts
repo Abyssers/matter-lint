@@ -1,4 +1,5 @@
 import { resolve } from "node:path";
+import { read } from "gray-matter";
 import { MatterOption } from "./option";
 import { MatterInfo } from "./info";
 
@@ -11,25 +12,7 @@ class MatterLint {
         this.#options = new Map();
     }
 
-    public add(
-        name: string,
-        param: boolean,
-        defaultValue: string | boolean,
-        callback: (opt: MatterOption, data: MatterInfo) => void = () => {
-            return;
-        }
-    ): MatterLint {
-        const option = new MatterOption(name, param, defaultValue, callback);
-        this.#queue.push(name);
-        const { camelcase, dashed, abbrev } = option;
-        this.#options.set(name, option);
-        this.#options.set(camelcase, option);
-        this.#options.set(dashed, option);
-        this.#options.set(abbrev, option);
-        return this;
-    }
-
-    public parse(
+    private parse(
         cwd: string,
         args: string[]
     ): {
@@ -71,14 +54,35 @@ class MatterLint {
         return { opts, paths };
     }
 
+    public add(
+        name: string,
+        param: boolean,
+        defaultValue: string | boolean,
+        callback: (opt: MatterOption, data: MatterInfo) => MatterInfo
+    ): MatterLint {
+        const option = new MatterOption(name, param, defaultValue, callback);
+        this.#queue.push(name);
+        const { camelcase, dashed, abbrev } = option;
+        this.#options.set(name, option);
+        this.#options.set(camelcase, option);
+        this.#options.set(dashed, option);
+        this.#options.set(abbrev, option);
+        return this;
+    }
+
     public config(key: string, value: string | boolean): MatterLint {
         this.#options.has(key) && this.#options.get(key).set(value);
         return this;
     }
 
-    public run(data: MatterInfo): void {
-        this.#queue.forEach((name: string) => {
-            this.#options.get(name)?.handle(data);
+    public run(cwd: string, args: string[]): void {
+        const { opts, paths } = this.parse(cwd, args);
+        opts.forEach(opt => {
+            this.config(opt.key, opt.value);
+        });
+        paths.forEach(path => {
+            const doc = read(path);
+            console.log(doc);
         });
     }
 }
