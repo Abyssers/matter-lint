@@ -3,6 +3,6 @@ export interface MatterInfo {
     updated?: Date;
     author?: string;
     committer?: string;
-    contributors?: string[];
-    [key: string]: any;
+    contributors?: string;
+    [key: string]: boolean | number | string | Date;
 }
