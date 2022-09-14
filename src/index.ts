@@ -20,8 +20,7 @@ lint.add(
 );
 
 lint.add("force", false, false, (opt: MatterOption, path: string, data: MatterInfo, content: string) => {
-    const commits = jit.repo(cwd).do("log", ["-n <number>", "--pretty=fuller", "--", "<path>"], "1", path)
-        .formatted as any[];
+    const commits = jit.repo(cwd).do("log", ["--pretty=fuller", "--", "<path>"], path).formatted as any[];
     if (opt.value) {
         data["created"] = commits[commits.length - 1]["authorDate"] as Date;
         data["updated"] = commits[0]["authorDate"] as Date;
