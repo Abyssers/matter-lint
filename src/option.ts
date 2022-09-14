@@ -1,11 +1,18 @@
 import { MatterInfo } from "./info";
-export class Option {
+export class MatterOption {
     #name: string;
-    #value: any;
-    #callback: (opt: Option, data: MatterInfo) => void;
+    #value: string | boolean;
+    #param: boolean; // whether parameters are required
+    #callback: (opt: MatterOption, data: MatterInfo) => void;
 
-    constructor(name: string, value: any, callback: (opt: Option, data: MatterInfo) => void) {
+    constructor(
+        name: string,
+        param: boolean,
+        value: string | boolean,
+        callback: (opt: MatterOption, data: MatterInfo) => void
+    ) {
         this.#name = name;
+        this.#param = param;
         this.#value = value;
         this.#callback = callback;
     }
@@ -40,11 +47,15 @@ export class Option {
             .join("")}`;
     }
 
-    get value(): any {
+    get param(): boolean {
+        return this.#param;
+    }
+
+    get value(): string | boolean {
         return this.#value;
     }
 
-    public set(value: any): void {
+    public set(value: string | boolean): void {
         this.#value = value;
         return;
     }
