@@ -1,13 +1,20 @@
 import { Option } from "./option";
 
-export class Context {
+class Context {
     #options: Map<string, Option>;
 
     constructor() {
         this.#options = new Map();
     }
 
-    public add(option: Option): void {
+    public add(
+        name: string,
+        value: any,
+        callback: () => void = () => {
+            return;
+        }
+    ): void {
+        const option = new Option(name, value, callback);
         const { camelcase, dashed, abbrev } = option;
         this.#options.set(camelcase, option);
         this.#options.set(dashed, option);
@@ -23,3 +30,5 @@ export class Context {
         return false;
     }
 }
+
+export const ctx = new Context();
