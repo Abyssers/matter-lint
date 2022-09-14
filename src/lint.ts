@@ -1,0 +1,88 @@
+import { resolve } from "node:path";
+import { MatterOption } from "./option";
+import { MatterInfo } from "./info";
+
+class MatterLint {
+    #queue: string[];
+    #options: Map<string, MatterOption>;
+
+    constructor() {
+        this.#queue = [];
+        this.#options = new Map();
+    }
+
+    public add(
+        name: string,
+        param: boolean,
+        defaultValue: string | boolean,
+        callback: (opt: MatterOption, data: MatterInfo) => void = () => {
+            return;
+        }
+    ): MatterLint {
+        const option = new MatterOption(name, param, defaultValue, callback);
+        this.#queue.push(name);
+        const { camelcase, dashed, abbrev } = option;
+        this.#options.set(name, option);
+        this.#options.set(camelcase, option);
+        this.#options.set(dashed, option);
+        this.#options.set(abbrev, option);
+        return this;
+    }
+
+    public parse(
+        cwd: string,
+        args: string[]
+    ): {
+        opts: { key: string; value: string | boolean }[];
+        paths: string[];
+    } {
+        const opts = [];
+        const confs = [];
+        const paths = [];
+        const sepidx = args.indexOf("--");
+        if (sepidx !== -1 && sepidx < args.length - 1) {
+            confs.push(...args.slice(0, sepidx));
+            paths.push(...args.slice(sepidx + 1).map(p => resolve(cwd, p)));
+        } else {
+            confs.push(...args);
+        }
+        while (confs.length > 0) {
+            const cfg = confs.shift();
+            if (cfg.includes("=")) {
+                const eqidx = cfg.lastIndexOf("=");
+                const key = cfg.slice(0, eqidx);
+                if (this.#options.has(key)) {
+                    const { param } = this.#options.get(key);
+                    opts.push({
+                        key,
+                        value: param ? cfg.slice(eqidx + 1) : true,
+                    });
+                }
+            } else {
+                if (this.#options.has(cfg)) {
+                    const { param } = this.#options.get(cfg);
+                    opts.push({
+                        key: cfg,
+                        value: param ? (confs.length > 0 ? confs.shift() : "") : true,
+                    });
+                }
+            }
+        }
+        return { opts, paths };
+    }
+
+    public config(key: string, value: any): MatterLint {
+        if (this.#options.has(key)) {
+            this.#options.get(key).set(value);
+        }
+        return this;
+    }
+
+    public run(data: MatterInfo): void {
+        this.#queue.forEach((name: string) => {
+            this.#options.get(name).handle(data);
+        });
+    }
+}
+
+export const lint = new MatterLint();
