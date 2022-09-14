@@ -35,7 +35,7 @@ lint.add("force", false, false, (opt: MatterOption, path: string, data: MatterIn
         !has.call(data, "author") && (data["author"] = commits[commits.length - 1]["author"]["name"] as string);
         !has.call(data, "committer") && (data["committer"] = commits[0]["author"]["name"] as string);
         !has.call(data, "contributors") &&
-            (data["contributors"] = [...new Set(commits.map(commit => commit["author"]["name"]))].join("") as string);
+            (data["contributors"] = [...new Set(commits.map(commit => commit["author"]["name"]))].join(",") as string);
     }
     return [data, content];
 });
