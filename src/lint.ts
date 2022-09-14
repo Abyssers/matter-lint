@@ -1,4 +1,5 @@
-import { resolve } from "node:path";
+import { resolve, extname } from "node:path";
+import { existsSync } from "node:fs";
 import { read } from "gray-matter";
 import { MatterOption } from "./option";
 import { MatterInfo } from "./info";
@@ -58,7 +59,7 @@ class MatterLint {
         name: string,
         param: boolean,
         defaultValue: string | boolean,
-        callback: (opt: MatterOption, data: MatterInfo) => MatterInfo
+        callback: (opt: MatterOption, path: string, data: MatterInfo, content: string) => [MatterInfo, string]
     ): MatterLint {
         const option = new MatterOption(name, param, defaultValue, callback);
         this.#queue.push(name);
@@ -81,8 +82,12 @@ class MatterLint {
             this.config(opt.key, opt.value);
         });
         paths.forEach(path => {
-            const doc = read(path);
-            console.log(doc);
+            if ([".md", ".markdown"].includes(extname(path)) && existsSync(path)) {
+                let { data, content } = read(path);
+                this.#queue.forEach(name => {
+                    [data, content] = this.#options.get(name).handle(path, data, content);
+                });
+            }
         });
     }
 }
