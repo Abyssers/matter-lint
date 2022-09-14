@@ -3,13 +3,13 @@ export class MatterOption {
     #name: string;
     #value: string | boolean;
     #param: boolean; // whether parameters are required
-    #callback: (opt: MatterOption, data: MatterInfo, path: string) => MatterInfo;
+    #callback: (opt: MatterOption, path: string, data: MatterInfo, content: string) => [MatterInfo, string];
 
     constructor(
         name: string,
         param: boolean,
         value: string | boolean,
-        callback: (opt: MatterOption, data: MatterInfo, path: string) => MatterInfo
+        callback: (opt: MatterOption, path: string, data: MatterInfo, content: string) => [MatterInfo, string]
     ) {
         this.#name = name;
         this.#param = param;
@@ -60,7 +60,7 @@ export class MatterOption {
         return;
     }
 
-    public handle(data: MatterInfo, path: string): MatterInfo {
-        return this.#callback(this, data, path);
+    public handle(path: string, data: MatterInfo, content: string): [MatterInfo, string] {
+        return this.#callback(this, path, data, content);
     }
 }
