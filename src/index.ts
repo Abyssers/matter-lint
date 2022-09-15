@@ -40,7 +40,7 @@ lint.add("force", false, false, (opt: MatterOption, path: string, data: MatterIn
         if (opt.value) {
             data["author"] = commits[commits.length - 1]["author"]["name"] as string;
             data["committer"] = commits[0]["author"]["name"] as string;
-            data["contributors"] = [...new Set(commits.map(commit => commit["author"]["name"]))].join("") as string;
+            data["contributors"] = [...new Set(commits.map(commit => commit["author"]["name"]))].join(",") as string;
             data["created"] = commits[commits.length - 1]["authorDate"] as Date;
             data["updated"] = new Date();
         } else {
