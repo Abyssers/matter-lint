@@ -9,19 +9,23 @@ const cwd: string = process.cwd();
 const args: string[] = process.argv.slice(2);
 
 /* default configurations */
-lint.add("config", true, resolve(cwd, ".matterlint.json"), (opt: MatterOption) => {
+lint.add("config", true, resolve(cwd, ".matterlint.json"), (opt: MatterOption, ctx: MatterLintContext) => {
     if (
         typeof opt.value === "string" &&
         isAbsolute(opt.value) &&
         extname(opt.value) === ".json" &&
         existsSync(opt.value)
     ) {
+        const { cmdOptsKeys } = ctx;
         const opts = JSON.parse(readFileSync(opt.value, { encoding: "utf8" }));
 
         Object.keys(opts).forEach(key => {
             const option = lint.get(key);
-            if (option && option.name !== "config") {
-                lint.config(option.name, opts[key]);
+            if (option) {
+                const { name, camelcase, dashed, abbrev } = option;
+                if (name !== "config" && [name, camelcase, dashed, abbrev].every(k => !cmdOptsKeys.includes(k))) {
+                    lint.config(option.name, opts[key]);
+                }
             }
         });
     }
