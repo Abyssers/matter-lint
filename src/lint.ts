@@ -48,6 +48,8 @@ class MatterLint {
                         key,
                         value: param ? cfg.slice(eqidx + 1) : true,
                     });
+                } else {
+                    paths.push(cfg);
                 }
             } else {
                 if (this.#options.has(cfg)) {
@@ -56,6 +58,8 @@ class MatterLint {
                         key: cfg,
                         value: param ? (confs.length > 0 ? confs.shift() : "") : true,
                     });
+                } else {
+                    paths.push(cfg);
                 }
             }
         }
