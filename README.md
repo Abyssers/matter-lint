@@ -52,6 +52,12 @@ Write back:
 npx matter-lint -w -- <filePath1> <filePath2> ...
 ```
 
+Field Mapping:
+
+```sh
+npx matter-lint -m created:date;author:writer;contributors:writers -- <filePath1> <filePath2> ...
+```
+
 ### From the Configuration File
 
 Default Setting (.matterlint.json):
@@ -60,7 +66,12 @@ Default Setting (.matterlint.json):
 {
     "blankLines": 1,
     "force": false,
-    "write": false
+    "write": false,
+    "map": {
+        "created": "date",
+        "author": "writer",
+        "contributors": "writers"
+    }
 }
 ```
 

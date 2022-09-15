@@ -22,32 +22,12 @@ lint.add(
             existsSync(opt.value)
         ) {
             const opts = JSON.parse(readFileSync(opt.value, { encoding: "utf8" }));
+            console.log(opts);
+
             Object.keys(opts).forEach(key => {
                 const option = lint.get(key);
                 if (option && option.name !== "config") {
-                    if (typeof opts[key] === "undefined") return;
-                    if (typeof opts[key] === "function") return;
-                    if (typeof opts[key] === "symbol") return;
-                    if (Object.prototype.toString.call(opts[key]) === "[object Object]") return;
-                    if (typeof opts[key] === "number") opts[key] = (opts[key] as number).toString();
-                    if (Array.isArray(opts[key])) {
-                        opts[key] = (opts[key] as any[])
-                            .flat(Infinity)
-                            .map(v => {
-                                if (typeof v === "undefined") return "";
-                                if (typeof v === "function") return "";
-                                if (typeof v === "symbol") return "";
-                                if (Object.prototype.toString.call(v) === "[object Object]") return "";
-                                if (typeof v === "number") return v.toString();
-                                return (v as string).trim();
-                            })
-                            .join(",");
-                    }
-                    if (typeof opts[key] === "string") {
-                        lint.config(key, (opts[key] as string).trim());
-                    } else if (typeof opts[key] === "boolean") {
-                        lint.config(key, opts[key]);
-                    }
+                    lint.config(option.name, opts[key]);
                 }
             });
         }
@@ -59,22 +39,38 @@ lint.add("force", false, false, (opt: MatterOption, path: string, data: MatterIn
     if (typeof opt.value === "boolean") {
         const commits = jit.repo(cwd).do("log", ["--pretty=fuller", "--", "<path>"], path).formatted as any[];
         if (opt.value) {
-            data["created"] = commits[commits.length - 1]["authorDate"] as Date;
-            data["updated"] = commits[0]["authorDate"] as Date;
             data["author"] = commits[commits.length - 1]["author"]["name"] as string;
             data["committer"] = commits[0]["author"]["name"] as string;
             data["contributors"] = [...new Set(commits.map(commit => commit["author"]["name"]))].join("") as string;
+            data["created"] = commits[commits.length - 1]["authorDate"] as Date;
+            data["updated"] = commits[0]["authorDate"] as Date;
         } else {
             const { hasOwnProperty: has } = Object.prototype;
-            !has.call(data, "created") && (data["created"] = commits[commits.length - 1]["authorDate"] as Date);
-            !has.call(data, "updated") && (data["updated"] = commits[0]["authorDate"] as Date);
             !has.call(data, "author") && (data["author"] = commits[commits.length - 1]["author"]["name"] as string);
             !has.call(data, "committer") && (data["committer"] = commits[0]["author"]["name"] as string);
             !has.call(data, "contributors") &&
                 (data["contributors"] = [...new Set(commits.map(commit => commit["author"]["name"]))].join(
                     ","
                 ) as string);
+            !has.call(data, "created") && (data["created"] = commits[commits.length - 1]["authorDate"] as Date);
+            !has.call(data, "updated") && (data["updated"] = commits[0]["authorDate"] as Date);
         }
+    }
+    return [data, content];
+});
+
+lint.add("map", true, "", (opt: MatterOption, _path: string, data: MatterInfo, content: string) => {
+    if (typeof opt.value === "string") {
+        opt.value
+            .split(";")
+            .map(p => p.split(":"))
+            .forEach(map => {
+                const [originField, mappedField] = map;
+                if (Object.keys(data).includes(originField)) {
+                    data[mappedField] = data[originField];
+                    delete data[originField];
+                }
+            });
     }
     return [data, content];
 });
