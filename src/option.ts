@@ -21,7 +21,7 @@ export class MatterOption {
         return this.#name
             .toLowerCase()
             .split(/( |-)/)
-            .filter(w => w !== "")
+            .filter(w => w !== "" && w !== "-")
             .map((w, i) => (i === 0 ? w : w.at(0).toUpperCase() + w.slice(1)))
             .join("");
     }
@@ -30,7 +30,7 @@ export class MatterOption {
         return `--${this.#name
             .toLowerCase()
             .split(/( |-)/)
-            .filter(w => w !== "")
+            .filter(w => w !== "" && w !== "-")
             .join("-")}`;
     }
 
@@ -38,7 +38,7 @@ export class MatterOption {
         return `-${this.#name
             .toLowerCase()
             .split(/( |-)/)
-            .filter(w => w !== "")
+            .filter(w => w !== "" && w !== "-")
             .map(w => w.at(0))
             .join("")}`;
     }
