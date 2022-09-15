@@ -8,6 +8,7 @@ export interface MatterLintContext {
     path: string;
     data: MatterInfo;
     content: string;
+    cmdOptsKeys: string[];
     [key: string]: any;
 }
 
@@ -24,12 +25,12 @@ class MatterLint {
         cwd: string,
         args: string[]
     ): {
-        opts: { key: string; value: string | boolean }[];
+        cmdOpts: { key: string; value: string | boolean }[];
         paths: string[];
     } {
-        const opts = [];
         const confs = [];
         const paths = [];
+        const cmdOpts = [];
         const sepidx = args.indexOf("--");
         if (sepidx !== -1 && sepidx < args.length - 1) {
             confs.push(...args.slice(0, sepidx));
@@ -44,7 +45,7 @@ class MatterLint {
                 const key = cfg.slice(0, eqidx);
                 if (this.#options.has(key)) {
                     const { param } = this.#options.get(key);
-                    opts.push({
+                    cmdOpts.push({
                         key,
                         value: param ? cfg.slice(eqidx + 1) : true,
                     });
@@ -54,7 +55,7 @@ class MatterLint {
             } else {
                 if (this.#options.has(cfg)) {
                     const { param } = this.#options.get(cfg);
-                    opts.push({
+                    cmdOpts.push({
                         key: cfg,
                         value: param ? (confs.length > 0 ? confs.shift() : "") : true,
                     });
@@ -63,7 +64,7 @@ class MatterLint {
                 }
             }
         }
-        return { opts, paths };
+        return { cmdOpts, paths };
     }
 
     private legalize(value: any, depth = 1): string | boolean {
@@ -125,14 +126,15 @@ class MatterLint {
     }
 
     public run(cwd: string, args: string[]): void {
-        const { opts, paths } = this.parse(cwd, args);
-        opts.forEach(opt => {
-            this.config(opt.key, opt.value);
+        const { cmdOpts, paths } = this.parse(cwd, args);
+        const cmdOptsKeys = cmdOpts.map(o => o.key);
+        cmdOpts.forEach(cmdOpt => {
+            this.config(cmdOpt.key, cmdOpt.value);
         });
         paths.forEach(path => {
             if ([".md", ".markdown"].includes(extname(path)) && existsSync(path)) {
                 const { data, content } = read(path);
-                const ctx: MatterLintContext = { path, data, content };
+                const ctx: MatterLintContext = { path, data, content, cmdOptsKeys };
                 this.#queue.forEach(name => {
                     this.#options.get(name).handle(ctx);
                 });
