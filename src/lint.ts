@@ -66,6 +66,10 @@ class MatterLint {
         return this;
     }
 
+    public get(key: string): MatterOption | null {
+        return this.#options.has(key) ? this.#options.get(key) : null;
+    }
+
     public config(key: string, value: string | boolean): MatterLint {
         this.#options.has(key) && this.#options.get(key).set(value);
         return this;
