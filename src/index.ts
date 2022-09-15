@@ -22,7 +22,6 @@ lint.add(
             existsSync(opt.value)
         ) {
             const opts = JSON.parse(readFileSync(opt.value, { encoding: "utf8" }));
-            console.log(opts);
 
             Object.keys(opts).forEach(key => {
                 const option = lint.get(key);
