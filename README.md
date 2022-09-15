@@ -60,7 +60,7 @@ npx matter-lint -m created:date;author:writer;contributors:writers -- <filePath1
 
 ### From the Configuration File
 
-Default Setting (.matterlint.json):
+.matterlint.json:
 
 ```json
 {
