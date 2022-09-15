@@ -42,7 +42,7 @@ lint.add("force", false, false, (opt: MatterOption, path: string, data: MatterIn
             data["committer"] = commits[0]["author"]["name"] as string;
             data["contributors"] = [...new Set(commits.map(commit => commit["author"]["name"]))].join("") as string;
             data["created"] = commits[commits.length - 1]["authorDate"] as Date;
-            data["updated"] = commits[0]["authorDate"] as Date;
+            data["updated"] = new Date();
         } else {
             const { hasOwnProperty: has } = Object.prototype;
             !has.call(data, "author") && (data["author"] = commits[commits.length - 1]["author"]["name"] as string);
@@ -52,7 +52,7 @@ lint.add("force", false, false, (opt: MatterOption, path: string, data: MatterIn
                     ","
                 ) as string);
             !has.call(data, "created") && (data["created"] = commits[commits.length - 1]["authorDate"] as Date);
-            !has.call(data, "updated") && (data["updated"] = commits[0]["authorDate"] as Date);
+            !has.call(data, "updated") && (data["updated"] = new Date());
         }
     }
     return [data, content];
