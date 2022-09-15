@@ -79,14 +79,14 @@ lint.add("force", false, false, (opt: MatterOption, path: string, data: MatterIn
     return [data, content];
 });
 
-lint.add("blank-lines", true, "1", (opt: MatterOption, path: string, data: MatterInfo, content: string) => {
-    if (typeof opt.value === "string" && Number.isInteger(Number(opt.value))) {
+lint.add("blank-lines", true, "1", (opt: MatterOption, _path: string, data: MatterInfo, content: string) => {
+    if (typeof opt.value === "string" && !Number.isNaN(Number(opt.value))) {
         let rn = false;
-        while (content.indexOf("\r\n") === 0 || content.indexOf("\n") === 0) {
-            if (content.indexOf("\r\n") === 0) (content = content.slice(2)) && (rn = true);
-            if (content.indexOf("\n") === 0) content = content.slice(1);
+        while (content.startsWith("\r\n") || content.startsWith("\n")) {
+            if (content.startsWith("\r\n")) (content = content.slice(2)) && (rn = true);
+            if (content.startsWith("\n")) content = content.slice(1);
         }
-        content = new Array(Number(opt.value)).fill(rn ? "\r\n" : "\n").join("") + content;
+        content = new Array(Math.ceil(Number(opt.value))).fill(rn ? "\r\n" : "\n").join("") + content;
     }
     return [data, content];
 });
