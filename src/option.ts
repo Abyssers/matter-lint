@@ -1,12 +1,16 @@
-import { MatterInfo } from "./info";
-import { MatterHandler } from "./handler";
+import { MatterLintContext } from "./lint";
+
+export interface MatterOptionHandler {
+    (opt: MatterOption, ctx: MatterLintContext): void;
+}
+
 export class MatterOption {
     #name: string;
     #value: string | boolean;
     #param: boolean; // whether parameters are required
-    #handler: MatterHandler;
+    #handler: MatterOptionHandler;
 
-    constructor(name: string, param: boolean, value: string | boolean, handler: MatterHandler) {
+    constructor(name: string, param: boolean, value: string | boolean, handler: MatterOptionHandler) {
         this.#name = name;
         this.#param = param;
         this.#value = value;
@@ -56,7 +60,7 @@ export class MatterOption {
         return;
     }
 
-    public handle(path: string, data: MatterInfo, content: string): ReturnType<MatterHandler> {
-        return this.#handler(this, path, data, content);
+    public handle(ctx: MatterLintContext): ReturnType<MatterOptionHandler> {
+        return this.#handler(this, ctx);
     }
 }

@@ -1,8 +1,15 @@
 import { resolve, extname } from "node:path";
 import { existsSync } from "node:fs";
 import { read } from "gray-matter";
-import { MatterOption } from "./option";
-import { MatterHandler } from "./handler";
+import { MatterOption, MatterOptionHandler } from "./option";
+import { MatterInfo } from "./info";
+
+export interface MatterLintContext {
+    path: string;
+    data: MatterInfo;
+    content: string;
+    [key: string]: any;
+}
 
 class MatterLint {
     #queue: string[];
@@ -62,6 +69,7 @@ class MatterLint {
                 value = Number.prototype.toString.call(value);
                 break;
             case "bigint":
+                // eslint-disable-next-line no-undef
                 value = BigInt.prototype.toString.call(value);
                 break;
             case "symbol":
@@ -92,7 +100,7 @@ class MatterLint {
         return value;
     }
 
-    public add(name: string, param: boolean, defaultValue: string | boolean, handler: MatterHandler): MatterLint {
+    public add(name: string, param: boolean, defaultValue: string | boolean, handler: MatterOptionHandler): MatterLint {
         const option = new MatterOption(name, param, defaultValue, handler);
         this.#queue.push(name);
         const { camelcase, dashed, abbrev } = option;
@@ -119,9 +127,10 @@ class MatterLint {
         });
         paths.forEach(path => {
             if ([".md", ".markdown"].includes(extname(path)) && existsSync(path)) {
-                let { data, content } = read(path);
+                const { data, content } = read(path);
+                const ctx: MatterLintContext = { path, data, content };
                 this.#queue.forEach(name => {
-                    [data, content] = this.#options.get(name).handle(path, data, content);
+                    this.#options.get(name).handle(ctx);
                 });
             }
         });
