@@ -55,6 +55,43 @@ class MatterLint {
         return { opts, paths };
     }
 
+    private legalize(value: any, depth = 1): string | boolean {
+        if (depth < 0) return "";
+        switch (typeof value) {
+            case "number":
+                value = Number.prototype.toString.call(value);
+                break;
+            case "bigint":
+                value = BigInt.prototype.toString.call(value);
+                break;
+            case "symbol":
+            case "undefined":
+            case "function":
+                value = "";
+                break;
+            case "object":
+                {
+                    const { toString: typestr } = Object.prototype;
+                    if (typestr.call(value) === "[object Object]") {
+                        Object.keys(value).forEach(k => {
+                            value[k] = this.legalize(value[k], depth - 1);
+                        });
+                        value = Object.entries(value)
+                            .map(e => `${e[0]}:${e[1]}`)
+                            .join(";");
+                    } else if (typestr.call(value) === "[object Array]") {
+                        value = (value as any[]).map(v => this.legalize(v, depth - 1)).join(",");
+                    }
+                }
+                break;
+            case "boolean":
+            case "string":
+            default:
+                break;
+        }
+        return value;
+    }
+
     public add(name: string, param: boolean, defaultValue: string | boolean, handler: MatterHandler): MatterLint {
         const option = new MatterOption(name, param, defaultValue, handler);
         this.#queue.push(name);
@@ -70,8 +107,8 @@ class MatterLint {
         return this.#options.has(key) ? this.#options.get(key) : null;
     }
 
-    public config(key: string, value: string | boolean): MatterLint {
-        this.#options.has(key) && this.#options.get(key).set(value);
+    public config(key: string, value: any): MatterLint {
+        this.#options.has(key) && this.#options.get(key).set(this.legalize(value));
         return this;
     }
 
