@@ -21,6 +21,8 @@ jobs:
                   token: ${{ secrets.MORILENCE_GENERAL_PAT }}
             - name: "[Update the Version of @abysser/jit]"
               run: |
+                  git config --global user.name "Morilence"
+                  git config --global user.email "1280659615@qq.com"
                   npm version patch
                   npm install @abysser/jit@latest
             - name: "[Create Pull Request]"
