@@ -1,0 +1,39 @@
+name: update
+on:
+    repository_dispatch:
+        types:
+            - jit-updated
+jobs:
+    jit:
+        if: ${{ github.event.action == 'jit-updated' }}
+        runs-on: ubuntu-latest
+        environment: ABYSSERS_UPDATE_ENV
+        steps:
+            - name: "[Print Payloads]"
+              run: |
+                  echo "ref: ${{ github.event.client_payload.ref }}"
+                  echo "sha: ${{ github.event.client_payload.sha }}"
+                  echo "changes: ${{ github.event.client_payload.changes }}"
+            - name: "[Download Repo]"
+              uses: actions/checkout@v2
+              with:
+                  ref: main
+                  token: ${{ secrets.MORILENCE_GENERAL_PAT }}
+            - name: "[Update the Version of @abysser/jit]"
+              run: |
+                  npm install @abysser/jit@latest
+                  npm version patch
+            - name: "[Create Pull Request]"
+              uses: peter-evans/create-pull-request@v4
+              with:
+                  token: ${{ secrets.MORILENCE_GENERAL_PAT }}
+                  base: main
+                  commit-message: "chore: updated jit to ${{ github.event.client_payload.version }}"
+                  branch: ci/updates/jit
+                  delete-branch: true
+                  title: "chore: updated jit to ${{ github.event.client_payload.version }}"
+                  labels: auto
+                  team-reviewers: |
+                      owners
+                      developers
+                  draft: false
