@@ -1,6 +1,6 @@
 {
     "name": "@abysser/matter-lint",
-    "version": "1.2.2",
+    "version": "1.2.3",
     "description": "A front-matter normalizer that depends on the commit history",
     "main": "dist/index.js",
     "bin": {
