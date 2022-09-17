@@ -46,7 +46,7 @@ jobs:
         runs-on: ubuntu-latest
         environment: ABYSSERS_NOTIFY_ENV
         steps:
-            - name: "[Notify @abysser/blog of matter-lint Updates]"
+            - name: "[Notify Abyssers/blog of matter-lint Updates]"
               uses: peter-evans/repository-dispatch@v2
               with:
                   token: ${{ secrets.MORILENCE_GENERAL_PAT }}
