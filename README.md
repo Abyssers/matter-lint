@@ -55,7 +55,7 @@ npx matter-lint -w -- <filePath1> <filePath2> ...
 Field Mapping:
 
 ```sh
-npx matter-lint -m created:date;author:writer;contributors:writers -- <filePath1> <filePath2> ...
+npx matter-lint -m author:writer;contributors:writers;updatedby:last_revisor;created:date -- <filePath1> <filePath2> ...
 ```
 
 ### From the Configuration File
@@ -68,9 +68,10 @@ npx matter-lint -m created:date;author:writer;contributors:writers -- <filePath1
     "force": false,
     "write": false,
     "map": {
-        "created": "date",
         "author": "writer",
-        "contributors": "writers"
+        "contributors": "writers",
+        "updatedby": "last_revisor",
+        "created": "date",
     }
 }
 ```
