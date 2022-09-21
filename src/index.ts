@@ -35,12 +35,11 @@ lint.add("config", true, resolve(cwd, ".matterlint.json"), (opt: MatterOption, c
 lint.add("force", false, false, (opt: MatterOption, ctx: MatterLintContext) => {
     if (typeof opt.value === "boolean") {
         const { path } = ctx;
-        const latestCommit = (
-            jit.repo(cwd).do("log", ["-n <number>", "--pretty=fuller", "--", "<path>"], "1", path).formatted as any[]
-        )[0];
-        const earliestCommit = (
-            jit.repo(cwd).do("log", ["--reverse", "--pretty=fuller", "--", "<path>"], path).formatted as any[]
-        )[0];
+        const commits = jit.repo(cwd).do("log", ["--pretty=fuller", "--", "<path>"], path).formatted as any[];
+        ctx.commits = commits;
+        if (commits.length === 0) return;
+        const latestCommit = commits[0];
+        const earliestCommit = commits[commits.length - 1];
         const authors = jit.repo(cwd).do("shortlog", ["-sne", "HEAD", "--", "<path>"], path).formatted;
         if (opt.value) {
             ctx.data["author"] = earliestCommit["author"]["name"] as string;
@@ -70,6 +69,7 @@ lint.add("force", false, false, (opt: MatterOption, ctx: MatterLintContext) => {
 });
 
 lint.add("now", false, false, (opt: MatterOption, ctx: MatterLintContext) => {
+    if (!ctx.commits || ctx.commits.length === 0) return;
     if (typeof opt.value === "boolean") {
         if (opt.value) {
             const { force } = ctx;
@@ -85,6 +85,7 @@ lint.add("now", false, false, (opt: MatterOption, ctx: MatterLintContext) => {
 });
 
 lint.add("map", true, "", (opt: MatterOption, ctx: MatterLintContext) => {
+    if (!ctx.commits || ctx.commits.length === 0) return;
     if (typeof opt.value === "string") {
         opt.value
             .split(";")
@@ -100,6 +101,7 @@ lint.add("map", true, "", (opt: MatterOption, ctx: MatterLintContext) => {
 });
 
 lint.add("blank-lines", true, "1", (opt: MatterOption, ctx: MatterLintContext) => {
+    if (!ctx.commits || ctx.commits.length === 0) return;
     if (typeof opt.value === "string" && !Number.isNaN(Number(opt.value))) {
         let rn = false;
         while (ctx.content.startsWith("\r\n") || ctx.content.startsWith("\n")) {
@@ -111,6 +113,7 @@ lint.add("blank-lines", true, "1", (opt: MatterOption, ctx: MatterLintContext) =
 });
 
 lint.add("write", false, false, (opt: MatterOption, ctx: MatterLintContext) => {
+    if (!ctx.commits || ctx.commits.length === 0) return;
     if (typeof opt.value === "boolean") {
         if (opt.value) {
             writeFileSync(ctx.path, stringify(ctx.content, ctx.data));
